@@ -49,7 +49,7 @@
     <WarningLevel>4</WarningLevel>
     <DocumentationFile>output\v40\Debug\bin\Microsoft.PackageManagement.PackageListProvider.xml</DocumentationFile>
     <Prefer32Bit>false</Prefer32Bit>
-    <OutputPath>..\..\output\Debug\bin\</OutputPath>
+    <OutputPath>output\Debug\bin\</OutputPath>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -106,9 +106,6 @@
     </Reference>
     <Reference Include="Microsoft.PackageManagement-Win10-1607">
       <HintPath>dependencies\Microsoft.PackageManagement-Win10-1607.dll</HintPath>
-    </Reference>
-    <Reference Include="Newtonsoft.Json">
-      <HintPath>\\scratch2\scratch\Jianyunt\Bin\OneGetJT\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="System">
     </Reference>

@@ -1,0 +1,107 @@
+{
+ "PowerShell": {
+		"displayName": "PowerShell_6.0.0.9",
+		"source": "https://github.com/PowerShell/PowerShell/releases/download/v6.0.0-alpha.9/PowerShell_6.0.0.9-alpha.9-win10-x64.msi",
+		"hash": {
+			"algorithm": "sha512",
+			"hashCode": "FFD0F988110BAECDC616ADA5E743581D5ABCE42B68AF78E1A95DB911F82A5AE6CBACCD9BE5712CF263B76FA208737185A093CDB47D4DE9077657C611DAFE4DA9"
+		},
+		"summary": "Powershell",
+		"type": "msi",
+		"version": "6.0.0.9"
+	},
+
+  "NodeJs": [
+    {
+      "common": {
+        "displayName": "Node.js",
+        "summary": "Node.js is a cross-platform runtime environment for developing server-side Web applications.",
+        "type": "msi",
+        "os": {
+          "minimumversion": "10.0.11085",
+          "architecture": [ "amd64" ],
+          "installationOption": [ "Windows Desktop", "Windows Server" ]
+        }
+      }
+    },
+    {
+      "source": "https://nodejs.org/dist/v6.2.0/node-v6.2.0-x64.msi",
+      "version": "6.2.0"
+    },
+    {
+      "source": "https://nodejs.org/dist/v6.1.0/node-v6.1.0-x64.msi",
+      "version": "6.1.0"
+    },
+    {
+      "source": "https://nodejs.org/dist/doesnotexist-x64.appx",
+      "version": "1.0.1",
+      "type": "appx",
+      "os": {
+        "minimumversion": "10.0.2",
+        "architecture": [ "amd64" ],
+        "installationOption": [ "Windows Nano Server" ]
+      }
+    }
+  ],
+
+  "Sysinternals": {
+    "displayName": "Sysinternals",
+    "source": "https://live.sysinternals.com/files/SysinternalsSuite.zip",
+    "summary": "The Sysinternals Troubleshooting Utilities have been rolled up into a single suite of tools.",
+    "type": "zip",
+    "version": "2016.4.28.0",
+    "destination": "C:\\Program Files"
+  },
+
+ "Notepad++": {
+    "displayName": "Notepad++",
+    "source": "https://notepad-plus-plus.org/repository/6.x/6.9.2/npp.6.9.2.Installer.exe",
+    "summary": "Notepad++ is a free source code editor.",
+    "type": "exe",
+    "installArguments": "/S",
+    "UnInstallAdditionalArguments": "/S",
+    "version": "6.9.2"
+  },
+    
+ "docker": {
+        "source": "https://get.docker.com/builds/Windows/x86_64/docker-1.12.0.zip",
+        "hash": {
+                "algorithm": "sha512",
+                "hashCode": "A64DB25C5B0CF30BDD8CA253CCBB5F5D97B4F8E68895CEE7AD0E908CAEAC1BA3F1FC0DA5FADA8111D393C7148562362EA465934E61B7E823935F9687E80D8091"
+        },
+          "summary": "Docker zip package",
+          "type": "zip",
+          "version": "1.12.0",
+          "destination": "%programfiles%"
+        },
+
+  "jquery": [
+   {
+      "common": {
+      "source": "https://www.nuget.org/api/v2",
+      "summary": "jQuery is a fast, small, and feature-rich JavaScript library. It makes things like HTML document traversal and manipulation, event handling, animation, etc.",
+      "type": "nupkg"
+      }
+    },
+
+    {
+      "source": "https://www.nuget.org/api/v2",
+      "version": "3.0.0",
+      "destination":".\\"
+    },
+
+    {
+      "source": "https://www.nuget.org/api/v2",
+      "version": "2.2.4"
+    }
+  ],
+
+  "GistProvider": {
+    "type": "psartifacts",
+    "summary": "A PowerShell Module.",
+    "license": "",
+    "author": "Dfinke.",
+	"version": "0.6",
+	"source": "https://www.powershellgallery.com/api/v2/"
+  }  
+}

@@ -26,6 +26,7 @@ namespace Microsoft.PackageManagement.PackageSourceListProvider
     using System.Security.Cryptography;
     using System.Linq;
     using ErrorCategory = PackageManagement.Internal.ErrorCategory;
+    using System.Management.Automation;
 
     public class WebDownloader
     {
@@ -253,41 +254,33 @@ namespace Microsoft.PackageManagement.PackageSourceListProvider
             }
             try
             {
-                HashAlgorithm hashAlgorithm = null;
-                switch (packageHash.algorithm.ToLowerInvariant())
+                string hashAlgorithm = packageHash.algorithm.ToLowerInvariant();
+                if (!("sha256".Equals(hashAlgorithm) || "md5".Equals(hashAlgorithm) || "sha512".Equals(hashAlgorithm)))
                 {
-                    case "sha256":
-                        hashAlgorithm = SHA256.Create();
-                        break;
-
-                    case "md5":
-                        hashAlgorithm = MD5.Create();
-                        break;
-
-                    case "sha512":
-                        hashAlgorithm = SHA512.Create();
-                        break;                    
-                    default:
-                        request.WriteError(ErrorCategory.InvalidArgument, Constants.ProviderName, Resources.Messages.InvalidHashAlgorithm, packageHash.algorithm);
-                        return false;
+                    request.WriteError(ErrorCategory.InvalidArgument, Constants.ProviderName, Resources.Messages.InvalidHashAlgorithm, packageHash.algorithm);
+                    return false;
                 }
 
-                using (FileStream stream = File.OpenRead(fileFullPath))
+                // compute the hash
+                string computedHash = ComputeHash(fileFullPath, hashAlgorithm,request);
+                if (computedHash == null)
                 {
-                    // compute the hash
-                    byte[] computedHash = hashAlgorithm.ComputeHash(stream);
-                    // convert the original hash we got from json
-                    byte[] hashFromJSON = Convert.FromBase64String(package.Hash.hashCode);
-                    if (!Enumerable.SequenceEqual(computedHash, hashFromJSON))
-                    {
-                        request.WriteError(ErrorCategory.InvalidOperation, Constants.ProviderName, Resources.Messages.HashVerificationFailed, package.Name, package.Source);
-                        return false;
-                    }
-                    else
-                    {
-                        request.Verbose(Resources.Messages.HashValidationSuccessfull);
-                    }
+                    request.WriteError(ErrorCategory.InvalidOperation, Constants.ProviderName, Resources.Messages.HashVerificationFailed, package.Name, package.Source);
+                    return false;
                 }
+                // hash from json
+                string hashFromJSON = package.Hash.hashCode;
+                //compare computed hash with hash from json
+                if (!hashFromJSON.Equals(computedHash))
+                {
+                    request.WriteError(ErrorCategory.InvalidOperation, Constants.ProviderName, Resources.Messages.HashVerificationFailed, package.Name, package.Source);
+                    return false;
+                }
+                else
+                {
+                    request.Verbose(Resources.Messages.HashValidationSuccessfull);
+                }
+
             }
             catch
             {
@@ -297,5 +290,23 @@ namespace Microsoft.PackageManagement.PackageSourceListProvider
             
            return true;
         }
+
+        internal static string ComputeHash(string fileFullPath, string hashAlgorithm, PackageSourceListRequest request)
+        {
+            PSObject result = null;
+            using (PowerShell powershell = PowerShell.Create())
+            {
+                if (powershell != null)
+                {
+                    result = powershell
+                    .AddCommand("Get-FileHash")
+                    .AddParameter("Path", fileFullPath)
+                    .AddParameter("Algorithm", hashAlgorithm)
+                    .Invoke().FirstOrDefault();
+                }
+                return (string)result.Members["Hash"].Value;
+            }
+        }
+
     }
 }

@@ -126,7 +126,6 @@ namespace Microsoft.PackageManagement.PackageSourceListProvider
 
                 foreach (var dep in package.Dependencies)
                 {
-                    //TODO check name and version
                     if (packages.ContainsKey(dep.Name))
                     {
                         var depObject = packages[dep.Name].Where(each => (each.Version == dep.Version) && !each.IsCommonDefinition).FirstOrDefault();
@@ -137,7 +136,7 @@ namespace Microsoft.PackageManagement.PackageSourceListProvider
                     }
                     else
                     {
-                        throw new InvalidOperationException(string.Format(CultureInfo.InvariantCulture, "'{0}' is not referenced but not defined in the file '{1}'", dep.Name, package.FilePath));
+                        throw new InvalidOperationException(string.Format(CultureInfo.InvariantCulture, "'{0}' is referenced but not defined in the file '{1}'", dep.Name, package.FilePath));
                     }
 
                 }
