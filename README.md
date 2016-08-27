@@ -177,7 +177,7 @@ Install-Package -ProviderName PSL -Name docker
 
 
 
-### Try it
+## Try it
 
 Let's walk through the following, assuming you are on Windows 10 anniversary edition.
 ```PowerShell
@@ -283,7 +283,9 @@ docker                         1.12.0           https://get.d... Docker zip pack
 
 ```
 
-Now we learned how to use PSL. See [its design flow diagram][diagram] if you have more interests.
+## Design
+Now we learned how to use PSL.
+See [its design flow diagram][diagram] if you have interests. Also see the [known issues][known-issue].
 
 ## Developing and Contributing
 We welcome and appreciate contributions from the community. Please follow the [PowerShell contribution guidelines][guidelines].
@@ -309,3 +311,4 @@ For more information see the [Code of Conduct FAQ][conduct-FAQ] or contact [open
 [nointernet]: https://github.com/OneGet/oneget/wiki/Q-and-A
 [Validator]: https://jsonformatter.curiousconcept.com/
 [diagram]: ./docs/high-level-diagram.md
+[known-issue]: ./docs/known-issue.md
