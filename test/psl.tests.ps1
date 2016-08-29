@@ -12,13 +12,13 @@
 #  limitations under the License.
 #
 # ------------------ PackageManagement Test  -----------------------------------
-ipmo "$PSScriptRoot\utility.psm1"
+#ipmo "$PSScriptRoot\utility.psm1"
 $InternalGallery = "https://dtlgalleryint.cloudapp.net/api/v2/"
 $InternalSource = 'OneGetTestSource'
 
 
 # set to this feed to bootstrap the testing version
-$env:BootstrapProviderTestfeedUrl = "https://raw.githubusercontent.com/OneGet/ProviderRegistry/testing/providers.masterList.feed.swidtag"
+#$env:BootstrapProviderTestfeedUrl = "https://raw.githubusercontent.com/OneGet/ProviderRegistry/testing/providers.masterList.feed.swidtag"
 
 $psl = "psl"
 $location =".\testpsl.json"
@@ -35,15 +35,15 @@ if($provider.Name -notcontains $psl)
 
     if($a.Name -eq $psl)
     {
-        Install-PackageProvider $psl -verbose -force    
+        Install-PackageProvider $psl -verbose -force
     }
 }
 
-    
+
 $sources = Get-PackageSource -ProviderName $psl
 foreach ($s in $sources)
 {
-    Unregister-PackageSource -name $s.Name 
+    Unregister-PackageSource -name $s.Name
 }
 
 Register-PackageSource -name $source -ProviderName $psl -Location $location
@@ -59,7 +59,7 @@ Register-PackageSource -Name $InternalSource -Location $InternalGallery -Provide
 Describe "psl testing" -Tags @('BVT', 'DRT') {
     AfterAll {
         #reset the environment variable
-       $env:BootstrapProviderTestfeedUrl=""  
+       $env:BootstrapProviderTestfeedUrl=""
     }
 
     It "find-package" {
@@ -75,7 +75,7 @@ Describe "psl testing" -Tags @('BVT', 'DRT') {
 
         $c= find-package -name node.js -ProviderName $psl
         $c.Name -contains "node.js"  | Should Be $true
-        
+
     }
 
     It "find-package with version" {
@@ -85,11 +85,11 @@ Describe "psl testing" -Tags @('BVT', 'DRT') {
         $a.Name -contains "node.js" | Should Be $true
 
         $a | ?{ $_.Version -eq "6.2.0" } | should not BeNullOrEmpty
-        $a | ?{ $_.Version -eq "6.1.0" } | should not BeNullOrEmpty        
+        $a | ?{ $_.Version -eq "6.1.0" } | should not BeNullOrEmpty
     }
 
-    It "install-package with msi" {  
-            
+    It "install-package with msi" {
+
         $package = "node.js"
 
         $exist = get-package $package -ProviderName $psl -ErrorAction SilentlyContinue
@@ -100,31 +100,31 @@ Describe "psl testing" -Tags @('BVT', 'DRT') {
 
         $a= install-package -name $package  -ProviderName $psl -source $source -force -SkipHashValidation
         $a.Name -contains $package | Should Be $true
-           
+
         $b = get-package $package -verbose -provider $psl
         $b.Name -contains $package | Should Be $true
 
         $c= Uninstall-package $package -verbose  -ProviderName $psl
-        $c.Name -contains $package | Should Be $true 
+        $c.Name -contains $package | Should Be $true
    }
-    
-   It "install-package with zip" {  
-    
+
+   It "install-package with zip" {
+
         $package = "Sysinternals"
 
         $a= install-package -name $package  -ProviderName $psl -source $source -SkipHashValidation -force
         $a.Name -contains $package | Should Be $true
-           
+
         $b = get-package $package -provider $psl
         $b.Name -contains $package | Should Be $true
 
         $c= Uninstall-package $package  -provider $psl
-        $c.Name -contains $package | Should Be $true 
-    }       
-       
+        $c.Name -contains $package | Should Be $true
+    }
 
-    It "install-package with exe" {  
-    
+
+    It "install-package with exe" {
+
         $package = "notepad++"
 
         $exist = get-package $package  -ProviderName $psl  -ErrorAction SilentlyContinue
@@ -134,23 +134,23 @@ Describe "psl testing" -Tags @('BVT', 'DRT') {
 
         $a= install-package -name $package  -ProviderName $psl -source $source -SkipHashValidation -force
         $a.Name -contains $package | Should Be $true
-           
+
         $b = get-package $package -provider $psl
         $b.Name -contains $package | Should Be $true
 
         $c= Uninstall-package $package  -ProviderName $psl
-        $c.Name -contains $package | Should Be $true       
-    }       
-       
+        $c.Name -contains $package | Should Be $true
+    }
 
-    It "install-package with NuGet" {  
-    
+
+    It "install-package with NuGet" {
+
         $package = "jquery"
 
         # 3.0.0 of jQuery contains destination definition in psl.json
         $a= install-package -name $package  -ProviderName $psl -source $source  -force -RequiredVersion 3.0.0
         $a.Name -contains $package | Should Be $true
-           
+
         $b = get-package $package -provider $psl  -RequiredVersion 3.0.0
         $b.Name -contains $package | Should Be $true
 
@@ -158,29 +158,29 @@ Describe "psl testing" -Tags @('BVT', 'DRT') {
         $c.Name -contains $package | Should Be $true
 
         $d = get-package $package  -provider $psl -ErrorAction SilentlyContinue -WarningAction SilentlyContinue -RequiredVersion 3.0.0
-        $d | ?{ $_.Version.ToString() -eq "3.0.0" } | should BeNullOrEmpty    
-        
+        $d | ?{ $_.Version.ToString() -eq "3.0.0" } | should BeNullOrEmpty
+
          # 2.2.4 of jQuery does not contain destination definition in psl.json
         $a= install-package -name $package  -ProviderName $psl -source $source  -force -RequiredVersion 2.2.4
         $a.Version -contains "2.2.4" | Should Be $true
-           
+
         $b = get-package $package -provider $psl  -RequiredVersion 2.2.4
         $b.Name -contains $package | Should Be $true
 
         $c= Uninstall-package $package  -ProviderName $psl  -RequiredVersion 2.2.4
         $c.Name -contains $package | Should Be $true
 
-        $d = get-package $package  -RequiredVersion 2.2.4  -provider $psl -ErrorAction SilentlyContinue -WarningAction SilentlyContinue           
-        $d | ?{ $_.Version.ToString() -eq "2.2.4" } | should BeNullOrEmpty   
-    }       
-       
-    It "install-package with PowerShellGet" {  
-    
+        $d = get-package $package  -RequiredVersion 2.2.4  -provider $psl -ErrorAction SilentlyContinue -WarningAction SilentlyContinue
+        $d | ?{ $_.Version.ToString() -eq "2.2.4" } | should BeNullOrEmpty
+    }
+
+    It "install-package with PowerShellGet" {
+
         $package = "GistProvider"
 
         $a= install-package -name $package  -ProviderName $psl -source $source  -force -RequiredVersion 1.6
         $a.Name -contains $package | Should Be $true
-           
+
         $b = get-package $package -provider $psl -RequiredVersion 1.6
         $b.Name -contains $package | Should Be $true
 
@@ -188,16 +188,16 @@ Describe "psl testing" -Tags @('BVT', 'DRT') {
         $c.Name -contains $package | Should Be $true
 
         $d = get-package $package  -provider $psl -RequiredVersion 1.6 -ErrorAction SilentlyContinue -WarningAction SilentlyContinue
-        $d | ?{ $_.Version.ToString() -eq "1.6" } | should BeNullOrEmpty               
-    }  
+        $d | ?{ $_.Version.ToString() -eq "1.6" } | should BeNullOrEmpty
+    }
 
-   It "install-package by passing in -source location - expected warning" {  
-    
+   It "install-package by passing in -source location - expected warning" {
+
         $package = "Sysinternals"
 
         $a= install-package -name $package  -ProviderName $psl -source $location -SkipHashValidation -force -WarningVariable wv
         $a.Name -contains $package | Should Be $true
         $wv | Should Not BeNullOrEmpty
-         
-    } 
+
+    }
  }
