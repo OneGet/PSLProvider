@@ -1,7 +1,7 @@
 version: 1.0.0.{build}
-image:
-- WMF 5.1
-configuration: Release
+configuration:
+  - Release
+  - Win10 Release
 platform: Any CPU
 # Install Pester
 install:
