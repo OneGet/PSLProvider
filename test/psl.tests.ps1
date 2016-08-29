@@ -25,7 +25,7 @@ $location =".\testpsl.json"
 $source ="psl"
 
 
-import-packagemanagement
+import-module packagemanagement
 
 $provider = Get-PackageProvider
 
