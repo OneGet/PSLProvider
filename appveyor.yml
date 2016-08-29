@@ -1,5 +1,5 @@
 version: 1.0.0.{build}
-os:
+image:
 - WMF 5.1
 configuration: Release
 platform: Any CPU
