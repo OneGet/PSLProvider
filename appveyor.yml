@@ -1,0 +1,18 @@
+version: 1.0.0.{build}
+os:
+- WMF 5.1
+configuration: Release
+platform: Any CPU
+# Install Pester
+install:
+    - cinst -y pester
+clone_folder: c:\projects\PSLProvider
+build:
+  verbosity: minimal
+#after_build:
+#- ps: >-
+#    Get-ChildItem "C:\projects\psl\output\Release\bin" -Recurse | % { Push-AppveyorArtifact $_.FullName -FileName $_.Name -DeploymentName releasebits -Type Auto }
+
+before_test:
+- ps: >-
+    & "c:\projects\PSLProvider\Test\psl.tests.ps1"

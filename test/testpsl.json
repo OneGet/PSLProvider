@@ -62,7 +62,7 @@
     "UnInstallAdditionalArguments": "/S",
     "version": "6.9.2"
   },
-    
+
  "docker": {
         "source": "https://get.docker.com/builds/Windows/x86_64/docker-1.12.0.zip",
         "hash": {
@@ -101,7 +101,7 @@
     "summary": "A PowerShell Module.",
     "license": "",
     "author": "Dfinke.",
-	"version": "0.6",
-	"source": "https://www.powershellgallery.com/api/v2/"
-  }  
+	"version": "1.6",
+	"source": "https://dtlgalleryint.cloudapp.net/api/v2/"
+  }
 }
