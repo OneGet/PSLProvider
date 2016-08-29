@@ -9,6 +9,7 @@ install:
 clone_folder: c:\projects\PSLProvider
 build:
   verbosity: minimal
+  msbuild c:\projects\PSLProvider\PackageSourceListProvider.csproj /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
 #after_build:
 #- ps: >-
 #    Get-ChildItem "C:\projects\psl\output\Release\bin" -Recurse | % { Push-AppveyorArtifact $_.FullName -FileName $_.Name -DeploymentName releasebits -Type Auto }
