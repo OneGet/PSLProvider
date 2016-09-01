@@ -21,14 +21,16 @@ $InternalSource = 'OneGetTestSource'
 #$env:BootstrapProviderTestfeedUrl = "https://raw.githubusercontent.com/OneGet/ProviderRegistry/testing/providers.masterList.feed.swidtag"
 
 $psl = "psl"
-$location =".\testpsl.json"
+$location ="$PSScriptRoot\testpsl.json"
 $source ="psl"
-
 
 import-module packagemanagement
 
-$provider = Get-PackageProvider
+$PSVersionable
+& systeminfo.exe
 
+Get-Packageprovider -verbose
+$provider = Get-PackageProvider -verbose
 if($provider.Name -notcontains $psl)
 {
     $a= Find-PackageProvider -Name $psl -verbose -ForceBootstrap
@@ -39,7 +41,7 @@ if($provider.Name -notcontains $psl)
     }
 }
 
-
+Get-Packageprovider -verbose
 $sources = Get-PackageSource -ProviderName $psl
 foreach ($s in $sources)
 {

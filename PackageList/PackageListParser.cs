@@ -152,20 +152,19 @@ namespace Microsoft.PackageManagement.PackageSourceListProvider
 
             //read access only, and allow others to read at the same time
             Dictionary<string, List<PackageJson>> packages = new Dictionary<string, List<PackageJson>>(StringComparer.OrdinalIgnoreCase);
-            ICollection<PackageJson> list = new List<PackageJson>();
-
+           
             foreach (var package in psObjectEntries.Properties)
             {
                 // if this is an array
                 if (package.Value.GetType().GetTypeInfo().IsArray)
                 {
                     var result = PopulateFromArray(package.Value as object[], packageSpecPath, package.Name);
-
+                                        
                     // check that we got a valid array of entries
                     if (result != null && result.Count > 0)
-                    {
+                    {                       
                         var common = result.Select(each => each.Common).FirstOrDefault();
-
+                        List<PackageJson> list = new List<PackageJson>();
                         foreach (var item in result)
                         {
                             if (item.Common != null)
@@ -179,14 +178,30 @@ namespace Microsoft.PackageManagement.PackageSourceListProvider
 
                                 if (!EnsureRequiredFieldsExist(item))
                                 {
-                                    throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, Resources.Messages.RequiredFieldNotFound, item.Name));
+                                    throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, Resources.Messages.RequiredFieldNotFound, item.Name, packageSpecPath));
                                 }
                             }
 
                             item.PackageSource = packageSource;
+
+
+#if CORECLR
+                            if (Constants.MediaType.ExePackage.EqualsIgnoreCase(item.Type) ||
+                                Constants.MediaType.MsiPackage.EqualsIgnoreCase(item.Type) ||
+                                Constants.MediaType.MsuPackage.EqualsIgnoreCase(item.Type))
+                            {
+                                continue;
+                            }
+                            else
+                            {
+                                list.Add(item);                               
+                            }
+#else
+                            list.Add(item);                         
+#endif
                         }
 
-                        packages.Add(package.Name, result);
+                        packages.Add(package.Name, list);
                     }
                 }
                 else if (package.Value is PSObject)
@@ -210,7 +225,7 @@ namespace Microsoft.PackageManagement.PackageSourceListProvider
                             {
                                 throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, Resources.Messages.RequiredFieldNotFound, convertedPackage.Name, packageSpecPath));
                             }
-                        }
+                        }                      
 
 #if CORECLR
                         if (Constants.MediaType.ExePackage.EqualsIgnoreCase(convertedPackage.Type) ||
@@ -266,22 +281,7 @@ namespace Microsoft.PackageManagement.PackageSourceListProvider
                 {
                     packageEntry.FilePath = packageSpecPath;
                     packageEntry.Name = key;
-
-#if CORECLR
-                    if (Constants.MediaType.ExePackage.EqualsIgnoreCase(packageEntry.Type) ||
-                        Constants.MediaType.MsiPackage.EqualsIgnoreCase(packageEntry.Type) ||
-                        Constants.MediaType.MsuPackage.EqualsIgnoreCase(packageEntry.Type))
-                    {
-                        continue;
-                    }
-                    else
-                    {
-                        result.Add(packageEntry);
-                    }
-#else
-
                     result.Add(packageEntry);
-#endif
                 }
             }
 
