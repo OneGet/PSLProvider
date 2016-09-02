@@ -916,7 +916,7 @@ namespace Microsoft.PackageManagement.PackageSourceListProvider.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Uninstall operation failed by running a command &apos;{0}&apos; , see error details: &apos;{1}&apos;..
+        ///   Looks up a localized string similar to Uninstall operation failed by running a command &apos;{0}&apos;, see error details: &apos;{1}&apos;..
         /// </summary>
         internal static string UninstallFailed {
             get {

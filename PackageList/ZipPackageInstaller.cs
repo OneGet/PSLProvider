@@ -194,7 +194,12 @@ namespace Microsoft.PackageManagement.PackageSourceListProvider
             catch (Exception e)
             {
                 request.Debug(e.StackTrace);
-                request.WriteError(ErrorCategory.InvalidOperation, package.Name, Resources.Messages.InstallFailed, package.Name, e.Message);                
+                if (e is System.UnauthorizedAccessException) {
+                    request.WriteError(ErrorCategory.InvalidOperation, package.Name, Resources.Messages.InstallFailed, package.Name, "UnauthorizedAccessException. The requested operation likely requires elevation, i.e., launch PowerShell as administer");
+                } else {
+                    request.WriteError(ErrorCategory.InvalidOperation, package.Name, Resources.Messages.InstallFailed, package.Name, e.Message);
+                }
+
                 if (!(e is UnauthorizedAccessException || e is IOException))
                 {
                     // something wrong, delete the version folder
@@ -232,6 +237,16 @@ namespace Microsoft.PackageManagement.PackageSourceListProvider
 
             if (!string.IsNullOrWhiteSpace(path) && Directory.Exists(path))
             {
+                //Try to delete the directory to see if we can. Error out if we donot have permission          
+                if (Directory.Exists(path))
+                {
+                    try {
+                        Directory.Delete(path, true);
+                    }
+                    catch (System.UnauthorizedAccessException) {
+                        request.WriteError(ErrorCategory.InvalidOperation, package.Name, Resources.Messages.UninstallFailed, "UnInstall-Package", "UnauthorizedAccessException. The requested operation likely requires elevation, i.e., launch PowerShell as administer");
+                    }
+                }
                 path.TryHardToDelete();
 
                 var dir = Path.Combine(package.Destination, package.Name);

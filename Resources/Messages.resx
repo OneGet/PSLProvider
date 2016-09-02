@@ -360,7 +360,7 @@
     <value>Running command '{0}'</value>
   </data>
   <data name="UninstallFailed" xml:space="preserve">
-    <value>Uninstall operation failed by running a command '{0}' , see error details: '{1}'.</value>
+    <value>Uninstall operation failed by running a command '{0}', see error details: '{1}'.</value>
   </data>
   <data name="Uninstalling" xml:space="preserve">
     <value>UnInstalling a package ...</value>
