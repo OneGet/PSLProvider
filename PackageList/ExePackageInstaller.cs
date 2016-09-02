@@ -141,7 +141,11 @@ namespace Microsoft.PackageManagement.PackageSourceListProvider
                 }
 
                 return false;
-            }
+            } catch (Exception ex)  {
+                request.Error(ErrorCategory.InvalidOperation, "install-package", ex.Message);
+                ex.Dump(request);
+                return false;
+            }       
             finally
             {
                 if (File.Exists(exePackage))
@@ -556,44 +560,50 @@ namespace Microsoft.PackageManagement.PackageSourceListProvider
                 //LoadUserProfile = true,
             };
 
-           
-            using (var proc = Process.Start(start))
-            {
-                // percent between startProgress and endProgress
-                var progressPercent = tracker.ConvertPercentToProgress(percent += 0.01);
-
-                request.Progress(tracker.ProgressID, (int)progressPercent, Resources.Messages.RunningCommand, file);
-
-                if (proc == null)
+            try {
+                using (var proc = Process.Start(start))
                 {
-                    return false;
-                }
-              
-                timer = new Timer(_ => {
-                    percent += 0.025;
-                   
-                    if (progressPercent < 90)
+                    // percent between startProgress and endProgress
+                    var progressPercent = tracker.ConvertPercentToProgress(percent += 0.01);
+
+                    request.Progress(tracker.ProgressID, (int)progressPercent, Resources.Messages.RunningCommand, file);
+
+                    if (proc == null)
                     {
-                        request.Progress(tracker.ProgressID, (int) progressPercent, Resources.Messages.RunningCommand, file);
+                        return false;
                     }
-                    if (request.IsCanceled)
+
+                    timer = new Timer(_ => {
+                        percent += 0.025;
+
+                        if (progressPercent < 90)
+                        {
+                            request.Progress(tracker.ProgressID, (int)progressPercent, Resources.Messages.RunningCommand, file);
+                        }
+                        if (request.IsCanceled)
+                        {
+                            cleanUpAction();
+                        }
+                    }, null, 0, 3000);
+
+
+                    proc.WaitForExit();
+                    if (proc.ExitCode != 0)
                     {
-                        cleanUpAction();
+                        request.Error(ErrorCategory.InvalidOperation, fastPackageReference, Resources.Messages.UninstallFailed, file, proc.StandardError.ReadToEnd());
+                        request.CompleteProgress(tracker.ProgressID, false);
+
+                        return false;
                     }
-                }, null, 0, 3000);
-
-
-                proc.WaitForExit();
-                if (proc.ExitCode != 0)
-                {
-                    request.Error(ErrorCategory.InvalidOperation, fastPackageReference, Resources.Messages.UninstallFailed, file, proc.StandardError.ReadToEnd());
-                    request.CompleteProgress(tracker.ProgressID, false);
-
-                    return false;
+                    request.CompleteProgress(tracker.ProgressID, true);
+                    return true;
                 }
-                request.CompleteProgress(tracker.ProgressID, true);
-                return true;
             }
+            catch (Exception e)
+            {
+                request.Error(ErrorCategory.InvalidOperation, fastPackageReference, Resources.Messages.UninstallFailed, file, e.Message);
+            }
+            return false;
         }
 
         internal static void DownloadExePackage(string fastPath, string location, PackageSourceListRequest request)
